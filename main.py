@@ -2,8 +2,9 @@ import argparse
 import os
 from PIL import Image
 import numpy as np
-from process import process_interpollation
+from process import process_interpolation
 from process import fill_values
+from process import interpolate_pol
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -25,9 +26,11 @@ if __name__ == "__main__":
         image = np.array(Image.open(path))
         # print(image.shape)
 
-        i0, i45, i135, i90 = process_interpollation(image)
+        i0, i45, i135, i90 = process_interpolation(image)
 
         i0, i45, i135, i90 = fill_values(i0, i45, i135, i90, image)
+
+        i0, i45, i135, i90 = interpolate_pol(i0, i45, i135, i90)
 
         image_out = Image.fromarray(i0)
         image_out.save(output_images_path[indx])

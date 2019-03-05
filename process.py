@@ -1,7 +1,8 @@
+from PIL import Image
 import numpy as np
 
 
-def process_interpollation(image):
+def process_interpolation(image):
     # print(image.shape)
     threshold = 5.7
 
@@ -124,8 +125,8 @@ def process_interpollation(image):
 
 def fill_values(i0, i45, i135, i90, original):
 
-    for indx in original.shape[0]:
-        for indy in original.shape[1]:
+    for indx in range(original.shape[0]):
+        for indy in range(original.shape[1]):
 
             if indx % 2 == 0:
 
@@ -140,4 +141,37 @@ def fill_values(i0, i45, i135, i90, original):
                     i45[indx, indy] = original[indx, indy]
                 else:
                     i90[indx, indy] = original[indx, indy]
+    return [i0, i45, i135, i90]
+
+
+def interpolate_pol(i0, i45, i135, i90):
+
+    inter1 = Image.fromarray(i0)
+    img = inter1.resize((int(640 / 2), int(480 / 2)), Image.ANTIALIAS)
+    inter2 = img
+    img = inter2.resize((int(640), int(480)), Image.ANTIALIAS)
+
+    i0 = np.array(img)
+
+    inter1 = Image.fromarray(i45)
+    img = inter1.resize((int(640 / 2), int(480 / 2)), Image.ANTIALIAS)
+    inter2 = img
+    img = inter2.resize((int(640), int(480)), Image.ANTIALIAS)
+
+    i45 = np.array(img)
+
+    inter1 = Image.fromarray(i135)
+    img = inter1.resize((int(640 / 2), int(480 / 2)), Image.ANTIALIAS)
+    inter2 = img
+    img = inter2.resize((int(640), int(480)), Image.ANTIALIAS)
+
+    i135 = np.array(img)
+
+    inter1 = Image.fromarray(i90)
+    img = inter1.resize((int(640 / 2), int(480 / 2)), Image.ANTIALIAS)
+    inter2 = img
+    img = inter2.resize((int(640), int(480)), Image.ANTIALIAS)
+
+    i90 = np.array(img)
+
     return [i0, i45, i135, i90]
