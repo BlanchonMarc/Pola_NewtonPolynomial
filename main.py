@@ -5,6 +5,9 @@ import numpy as np
 from process import process_interpolation
 from process import fill_values
 from process import interpolate_pol
+from process import convert_to_HSL
+import cv2
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -23,20 +26,25 @@ if __name__ == "__main__":
     # print(output_images_path)
 
     for indx, path in enumerate(input_images_path):
-        image = np.array(Image.open(path))
+        # image = np.array(Image.open(path))
         # print(image.shape)
+        image = cv2.imread(path, -1)
+        if image is not None:
+            i0, i45, i135, i90 = process_interpolation(image)
 
-        i0, i45, i135, i90 = process_interpolation(image)
+            i0, i45, i135, i90 = fill_values(i0, i45, i135, i90, image)
 
-        i0, i45, i135, i90 = fill_values(i0, i45, i135, i90, image)
+            i0, i45, i135, i90 = interpolate_pol(i0, i45, i135, i90)
 
-        i0, i45, i135, i90 = interpolate_pol(i0, i45, i135, i90)
+            HSL = convert_to_HSL(i0, i45, i135, i90)
 
-        image_out = Image.fromarray(i0)
-        image_out.save(output_images_path[indx])
-        image_out = Image.fromarray(i45)
-        image_out.save("output/45.jpg")
-        image_out = Image.fromarray(i90)
-        image_out.save("output/90.jpg")
-        image_out = Image.fromarray(i135)
-        image_out.save("output/135.jpg")
+            cv2.imwrite(output_images_path[indx], HSL)
+            print('Done')
+        # image_out = Image.fromarray(HSL)
+        # image_out.save(output_images_path[indx])
+        # image_out = Image.fromarray(i45)
+        # image_out.save("output/45.jpg")
+        # image_out = Image.fromarray(i90)
+        # image_out.save("output/90.jpg")
+        # image_out = Image.fromarray(i135)
+        # image_out.save("output/135.jpg")
