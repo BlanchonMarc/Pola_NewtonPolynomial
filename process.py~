@@ -1,0 +1,66 @@
+import numpy as np
+
+
+def process_interpollation(image):
+    # print(image.shape)
+
+    for x in range(150, image.shape[0]):
+        for y in range(382, image.shape[1]):
+            # print(x)
+            I45_sum = 0
+            I_45_sum = 0
+            I45 = 0
+            I_45 = 0
+            for indx in [x-2, x, x+2]:
+                for indy in [y-2, y, y+2]:
+                    if indx-1 >= 0 and indx+1 <= image.shape[0] and indy-1 >= 0 and indy+1 <= image.shape[1]:
+                        try:
+                            I45 = image[indx, indy]
+                            I45 += (image[indx+1, indy-1] +
+                                    image[indx-1, indy+1]) / 2
+
+                            inter1 = (image[indx+1, indy-1] +
+                                      image[indx+1, indy-3])/2
+                            inter1 -= (image[indx+1, indy] -
+                                       (2*image[indx+1, indy-2])+image[indx+1, indy-4])/8
+
+                            inter2 = (image[indx-1, indy+1] +
+                                      image[indx-1, indy-1])/2
+                            inter2 -= (image[indx-1, indy + 2] -
+                                       (2*image[indx-1, indy])+image[indx-1, indy-2])/8
+
+                            I45 -= (inter1 + inter2) / 2
+
+                            # print(I45)
+
+                            I_45 = image[indx, indy]
+                            I_45 += (image[indx-1, indy-1] +
+                                     image[indx+1, indy+1]) / 2
+
+                            inter1 = (image[indx-1, indy-1] +
+                                      image[indx-1, indy-3]) / 2
+                            inter1 -= (image[indx-1, indy] -
+                                       (2*image[indx-1, indy-2]) + image[indx-1, indy-4])/8
+
+                            inter2 = (image[indx+1, indy+1] +
+                                      image[indx+1, indy-1])/2
+                            inter2 -= (image[indx+1, indy+2] -
+                                       (2*image[indx+1, indy]) + image[indx+1, indy-2])/8
+
+                            I_45 -= (inter1 + inter2) / 2
+
+                            I45_sum += abs(I45 - image[indx, indy])
+                            I_45_sum += abs(I_45 - image[indx, indy])
+
+                            # print(I_45)
+                        except(e):
+                            pass
+
+            print(I45_sum)
+            print(I_45_sum)
+            vals = [I45_sum, I_45_sum]
+            argmax = max(vals)
+            index = vals.index(max(vals))
+            print(argmax)
+            print(index)
+            exit(0)
