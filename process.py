@@ -109,7 +109,7 @@ def process_interpollation(image):
                 val = ((om45 * I45_save) + (om_45*I_45_save))/(om45 + om_45)
             if x % 2 == 0:
                 if y % 2 == 0:
-                    polarized0[x, y] = val
+                    polarized90[x, y] = val
 
                 else:
                     polarized45[x, y] = val
@@ -117,6 +117,27 @@ def process_interpollation(image):
                 if y % 2 == 0:
                     polarized135[x, y] = val
                 else:
-                    polarized90[x, y] = val
+                    polarized0[x, y] = val
 
     return [polarized0, polarized45, polarized135, polarized90]
+
+
+def fill_values(i0, i45, i135, i90, original):
+
+    for indx in original.shape[0]:
+        for indy in original.shape[1]:
+
+            if indx % 2 == 0:
+
+                if indy % 2 == 0:
+                    i0[indx, indy] = original[indx, indy]
+                else:
+                    i135[indx, indy] = original[indx, indy]
+
+            else:
+
+                if indy % 2 == 0:
+                    i45[indx, indy] = original[indx, indy]
+                else:
+                    i90[indx, indy] = original[indx, indy]
+    return [i0, i45, i135, i90]
