@@ -27,39 +27,39 @@ def process_interpolation(image):
                     # print(indy)
                     if indx-1 >= 0 and indx+1 <= image.shape[0]-1 and indy-4 >= 0 and indy+2 <= image.shape[1]-1:
                         try:
-                            I45 = np.uint16(image[indx, indy])
+                            I45 = int(image[indx, indy])
                             I45 += (image[indx+1, indy-1] +
                                     image[indx-1, indy+1]) / 2
 
-                            inter1 = (image[indx+1, indy-1] +
-                                      image[indx+1, indy-3])/2
-                            inter1 -= (image[indx+1, indy] -
-                                       (2*image[indx+1, indy-2])+image[indx+1, indy-4])/8
+                            inter1 = int((image[indx+1, indy-1] +
+                                          image[indx+1, indy-3])/2)
+                            inter1 -= int((image[indx+1, indy] -
+                                           (2*image[indx+1, indy-2])+image[indx+1, indy-4])/8)
 
-                            inter2 = (image[indx-1, indy+1] +
-                                      image[indx-1, indy-1])/2
-                            inter2 -= (image[indx-1, indy + 2] -
-                                       (2*image[indx-1, indy])+image[indx-1, indy-2])/8
+                            inter2 = int((image[indx-1, indy+1] +
+                                          image[indx-1, indy-1])/2)
+                            inter2 -= int((image[indx-1, indy + 2] -
+                                           (2*image[indx-1, indy])+image[indx-1, indy-2])/8)
 
-                            I45 -= (inter1 + inter2) / 2
+                            I45 -= int((inter1 + inter2) / 2)
 
                             # print(I45)
 
-                            I_45 = np.uint16(image[indx, indy])
-                            I_45 += (image[indx-1, indy-1] +
-                                     image[indx+1, indy+1]) / 2
+                            I_45 = int(image[indx, indy])
+                            I_45 += int((image[indx-1, indy-1] +
+                                         image[indx+1, indy+1]) / 2)
 
-                            inter1 = (image[indx-1, indy-1] +
-                                      image[indx-1, indy-3]) / 2
-                            inter1 -= (image[indx-1, indy] -
-                                       (2*image[indx-1, indy-2]) + image[indx-1, indy-4])/8
+                            inter1 = int((image[indx-1, indy-1] +
+                                          image[indx-1, indy-3]) / 2)
+                            inter1 -= int((image[indx-1, indy] -
+                                           (2*image[indx-1, indy-2]) + image[indx-1, indy-4])/8)
 
-                            inter2 = (image[indx+1, indy+1] +
-                                      image[indx+1, indy-1])/2
-                            inter2 -= (image[indx+1, indy+2] -
-                                       (2*image[indx+1, indy]) + image[indx+1, indy-2])/8
+                            inter2 = int((image[indx+1, indy+1] +
+                                          image[indx+1, indy-1])/2)
+                            inter2 -= int((image[indx+1, indy+2] -
+                                           (2*image[indx+1, indy]) + image[indx+1, indy-2])/8)
 
-                            I_45 -= (inter1 + inter2) / 2
+                            I_45 -= int((inter1 + inter2) / 2)
                             if indx == x and indy == y:
                                 I45_save = I45
                                 I_45_save = I_45
@@ -101,10 +101,10 @@ def process_interpolation(image):
                     if yvecnew > image.shape[1]-1 or yvecnew < 0:
                         yvec[indice] = y
 
-                d45 = np.uint16(abs(image[xvec[2], yvec[1]] - image[xvec[1], yvec[2]]) + abs(
-                    2*image[x, y] - image[xvec[0], yvec[3]] - image[xvec[3], yvec[0]]))
-                d_45 = np.uint16(abs(image[xvec[1], yvec[1]]-image[xvec[2], yvec[2]]) + abs(
-                    2*image[x, y] - image[xvec[0], yvec[0]] - image[xvec[3], yvec[3]]))
+                d45 = abs(image[xvec[2], yvec[1]] - image[xvec[1], yvec[2]]) + abs(
+                    2*image[x, y] - image[xvec[0], yvec[3]] - image[xvec[3], yvec[0]])
+                d_45 = abs(image[xvec[1], yvec[1]]-image[xvec[2], yvec[2]]) + abs(
+                    2*image[x, y] - image[xvec[0], yvec[0]] - image[xvec[3], yvec[3]])
 
                 om45 = 1 / (d45 + eps)
                 om_45 = 1 / (d_45 + eps)
@@ -266,12 +266,13 @@ def convert_to_HSL(i0, i45, i135, i90):
     intet = inten/inten.max()*255
     print(intet)
     print(intet.dtype)
-    # cv2.imwrite(
-    #    "/Users/marc/Github/Pola_NewtonPolynomial/output/inten.tiff", np.uint16(inten))
-    # cv2.imwrite(
-    #    "/Users/marc/Github/Pola_NewtonPolynomial/output/aop.tiff", np.uint16(aop))
-    # cv2.imwrite(
-    #    "/Users/marc/Github/Pola_NewtonPolynomial/output/dop.tiff", np.uint16(dop))
+
+    cv2.imwrite(
+        "/Users/marc/Github/Pola_NewtonPolynomial/output/inten.tiff", intet)
+    cv2.imwrite(
+        "/Users/marc/Github/Pola_NewtonPolynomial/output/aop.tiff", aopt)
+    cv2.imwrite(
+        "/Users/marc/Github/Pola_NewtonPolynomial/output/dop.tiff", dopa)
 
     hsv = np.zeros((i0.shape[0], i0.shape[1], 3))
 
