@@ -6,6 +6,7 @@ from process import process_interpolation
 from process import fill_values
 from process import interpolate_pol
 from process import convert_to_HSL
+from process import export
 import cv2
 
 
@@ -43,6 +44,8 @@ if __name__ == "__main__":
 
             HSL = convert_to_HSL(i0, i45, i135, i90)
 
+            decomp = export(i0, i45, i135, i90)
+            cv2.imwrite(args.output + "decomp.jpg", decomp)
             cv2.imwrite(output_images_path[indx], HSL)
             cv2.imwrite(args.output + "testHSL.jpg", HSL)
             print('Done')

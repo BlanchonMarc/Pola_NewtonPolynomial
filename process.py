@@ -305,3 +305,41 @@ def convert_to_HSL(i0, i45, i135, i90):
     # return fina
 
     # return rgb
+
+
+def export(i0, i45, i135, i90):
+    """Image representation for export"""
+
+    i45 = np.uint8(i45)
+    i90 = np.uint8(i90)
+    i135 = np.uint8(i135)
+
+    Js = [i0, i45, i90, i135]
+
+    inten = (Js[0]+Js[1]+Js[2]+Js[3])/2.
+    aop = np.float64((0.5*np.arctan2(Js[1]-Js[3], Js[0]-Js[2])))
+    dop = np.sqrt((Js[1]-Js[3])**2+(Js[0]-Js[2])**2) / \
+        (Js[0]+Js[1]+Js[2]+Js[3]+np.finfo(float).eps)*2
+
+    hsv = np.uint8(cv2.merge(
+        (np.float64((aop+np.pi/2)/np.pi*180), (dop)*255, inten/inten.max()*255)))
+
+    # hsv = np.uint8(cv2.merge(((aop+np.pi/2)/np.pi*180,
+    #                          dop*255,
+    #                          inten/inten.max()*255)))
+    rgb = cv2.cvtColor(hsv, cv2.COLOR_HSV2RGB)
+
+    nbr, nbc = aop.shape[0], aop.shape[1]
+    fina = np.zeros((nbr*2, nbc*2, 3), dtype='uint8')
+    aop_colorHSV = np.uint8(cv2.merge(((aop+np.pi/2)/np.pi*180,
+                                       np.ones(aop.shape)*255,
+                                       np.ones(aop.shape)*255)))
+    aop_colorRGB = cv2.cvtColor(aop_colorHSV, cv2.COLOR_HSV2RGB)
+
+    for c in range(3):
+        fina[:nbr, :nbc, c] = np.uint8(inten/inten.max()*255)
+        fina[:nbr, nbc:, c] = aop_colorRGB[:, :, c]
+        fina[nbr:, :nbc, c] = np.uint8(dop*255)
+        fina[nbr:, nbc:, c] = rgb[:, :, c]
+
+    return fina
