@@ -36,9 +36,15 @@ if __name__ == "__main__":
 
             i0, i45, i135, i90 = interpolate_pol(i0, i45, i135, i90)
 
+            cv2.imwrite(args.output + "test0.jpg", i0)
+            cv2.imwrite(args.output + "test45.jpg", i45)
+            cv2.imwrite(args.output + "test90.jpg", i90)
+            cv2.imwrite(args.output + "test135.jpg", i135)
+
             HSL = convert_to_HSL(i0, i45, i135, i90)
 
             cv2.imwrite(output_images_path[indx], HSL)
+            cv2.imwrite(args.output + "testHSL.jpg", HSL)
             print('Done')
         # image_out = Image.fromarray(HSL)
         # image_out.save(output_images_path[indx])

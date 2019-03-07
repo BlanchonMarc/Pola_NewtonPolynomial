@@ -149,14 +149,14 @@ def interpolate_pol(i0, i45, i135, i90):
 
     # inter1 = Image.fromarray(i0)
     # img = inter1.resize((int(640 / 2), int(480 / 2)), Image.ANTIALIAS)
-    src = i0
-    img = cv2.resize(src, (int(640 / 2), int(480 / 2)),
-                     interpolation=cv2.INTER_NEAREST)
-    inter2 = img
-    img = cv2.resize(inter2, (int(640), int(480)),
-                     interpolation=cv2.INTER_NEAREST)
+    # src = i0
+    # img = cv2.resize(src, (int(640 / 2), int(480 / 2)),
+    #                 interpolation=cv2.INTER_LINEAR)
+    # inter2 = img
+    # img = cv2.resize(inter2, (int(640), int(480)),
+    #                 interpolation=cv2.INTER_LINEAR)
 
-    i0 = np.array(img)
+    # i0 = np.array(img)
 
     # inter1=Image.fromarray(i45)
     # img=inter1.resize((int(640 / 2), int(480 / 2)), Image.ANTIALIAS)
@@ -165,32 +165,32 @@ def interpolate_pol(i0, i45, i135, i90):
 
     # i45=np.array(img)
 
-    src = i45
-    img = cv2.resize(src, (int(640 / 2), int(480 / 2)),
-                     interpolation=cv2.INTER_NEAREST)
-    inter2 = img
-    img = cv2.resize(inter2, (int(640), int(480)),
-                     interpolation=cv2.INTER_NEAREST)
+    # src = i45
+    # img = cv2.resize(src, (int(640 / 2), int(480 / 2)),
+    #                 interpolation=cv2.INTER_LINEAR)
+    # inter2 = img
+    # img = cv2.resize(inter2, (int(640), int(480)),
+    #                 interpolation=cv2.INTER_LINEAR)
 
-    i45 = np.array(img)
+    # i45 = np.array(img)
 
-    src = i135
-    img = cv2.resize(src, (int(640 / 2), int(480 / 2)),
-                     interpolation=cv2.INTER_NEAREST)
-    inter2 = img
-    img = cv2.resize(inter2, (int(640), int(480)),
-                     interpolation=cv2.INTER_NEAREST)
+    # src = i135
+    # img = cv2.resize(src, (int(640 / 2), int(480 / 2)),
+    #                 interpolation=cv2.INTER_LINEAR)
+    # inter2 = img
+    # img = cv2.resize(inter2, (int(640), int(480)),
+    #                 interpolation=cv2.INTER_LINEAR)
 
-    i135 = np.array(img)
+    # i135 = np.array(img)
 
-    src = i90
-    img = cv2.resize(src, (int(640 / 2), int(480 / 2)),
-                     interpolation=cv2.INTER_NEAREST)
-    inter2 = img
-    img = cv2.resize(inter2, (int(640), int(480)),
-                     interpolation=cv2.INTER_NEAREST)
+    # src = i90
+    # img = cv2.resize(src, (int(640 / 2), int(480 / 2)),
+    #                 interpolation=cv2.INTER_LINEAR)
+    # inter2 = img
+    # img = cv2.resize(inter2, (int(640), int(480)),
+    #                 interpolation=cv2.INTER_LINEAR)
 
-    i90 = np.array(img)
+    # i90 = np.array(img)
     # inter1=Image.fromarray(i135)
     # img=inter1.resize((int(640 / 2), int(480 / 2)), Image.ANTIALIAS)
     # inter2=img
@@ -205,25 +205,59 @@ def interpolate_pol(i0, i45, i135, i90):
 
     # i90=np.array(img)
 
+    for indx in range(1, i0.shape[0]-1):
+        for indy in range(1, i0.shape[1]-1):
+
+            if (indx % 2 == 0 and indy % 2 == 0) or (indx % 2 != 0 and indy % 2 != 0):
+                # 135 , 45
+                i135[indx, indy] = (
+                    i135[indx-1, indy] + i135[indx+1, indy] + i135[indx, indy-1] + i135[indx, indy+1])/4
+                i45[indx, indy] = (
+                    i45[indx-1, indy] + i45[indx+1, indy] + i45[indx, indy-1] + i45[indx, indy+1])/4
+            elif (indx % 2 == 0 and indy % 2 != 0) or (indx % 2 != 0 and indy % 2 == 0):
+                # 00 , 90
+                i0[indx, indy] = (i0[indx-1, indy] + i0[indx+1,
+                                                        indy] + i0[indx, indy-1] + i0[indx, indy+1])/4
+                i90[indx, indy] = (
+                    i90[indx-1, indy] + i90[indx+1, indy] + i90[indx, indy-1] + i90[indx, indy+1])/4
+            # elif indx % 2 != 0 and indy % 2 == 0:
+                # 0 , 90
+            # elif indx % 2 != 0 and indy % 2 != 0:
+                # 135 , 45
+
     return [i0, i45, i135, i90]
 
 
 def convert_to_HSL(i0, i45, i135, i90):
 
-    # Js = [i0, i45, i90, i135]
+    Js = [i0, i45, i90, i135]
 
-    inten = (i0+i45+i90+i135)/2.
-    aop = (0.5*np.arctan2(i45-i135, i0-i45))
-    dop = np.sqrt((i45-i135)**2+(i0-i45)**2) / (i0 + i90 + np.finfo(float).eps)
+    inten = (Js[0]+Js[1]+Js[2]+Js[3])/2.
+    aop = (0.5*np.arctan2(Js[1]-Js[3], Js[0]-Js[2]))
+    dop = np.sqrt((Js[1]-Js[3])**2+(Js[0]-Js[2])**2) / \
+        (Js[0]+Js[1]+Js[2]+Js[3]+np.finfo(float).eps)*2
+    cv2.imwrite(
+        "/Users/marc/Github/Pola_NewtonPolynomial/output/inten.tiff", np.uint16(inten))
+    cv2.imwrite(
+        "/Users/marc/Github/Pola_NewtonPolynomial/output/aop.tiff", np.uint16(aop))
+    cv2.imwrite(
+        "/Users/marc/Github/Pola_NewtonPolynomial/output/dop.tiff", np.uint16(dop))
+    # inten = (i0+i45+i90+i135)/2.
+    # aop = (0.5*np.arctan2(i45-i135, i0-i45))
+    # dop = np.sqrt((i45-i135)**2+(i0-i45)**2) / (i0 + i90 + np.finfo(float).eps)
 
-    #hsv = np.zeros((i0.shape[0], i0.shape[1], 3))
+    hsv = np.zeros((i0.shape[0], i0.shape[1], 3))
 
-    #hsv[:, :, 0] = (aop+np.pi/2)/np.pi*180
-    #hsv[:, :, 1] = dop*255
-    #hsv[:, :, 2] = inten/inten.max()*255
-    #hsv = np.uint8(hsv)
-    hsv = cv2.merge((np.uint8((aop+np.pi/2)/np.pi*180),
-                     np.uint8(dop*255), np.uint8(inten/inten.max()*255)))
+    hsv[:, :, 0] = (aop+np.pi/2)/np.pi*180
+    hsv[:, :, 1] = dop*255
+    hsv[:, :, 2] = inten/inten.max()*255
+    hsv = np.uint8(hsv)
+    # hsv = cv2.merge((np.uint8((aop+np.pi/2)/np.pi*180),
+    #                 np.uint8(dop*255), np.uint8(inten/inten.max()*255)))
+
+    # hsv = np.uint8(cv2.merge(((aop+np.pi/2)/np.pi*180,
+    #                          dop*255,
+    #                          inten/inten.max()*255)))
     rgb = cv2.cvtColor(hsv, cv2.COLOR_HSV2RGB)
 
     return rgb
