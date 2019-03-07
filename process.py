@@ -27,7 +27,7 @@ def process_interpolation(image):
                     # print(indy)
                     if indx-1 >= 0 and indx+1 <= image.shape[0]-1 and indy-4 >= 0 and indy+2 <= image.shape[1]-1:
                         try:
-                            I45 = image[indx, indy]
+                            I45 = np.uint16(image[indx, indy])
                             I45 += (image[indx+1, indy-1] +
                                     image[indx-1, indy+1]) / 2
 
@@ -45,7 +45,7 @@ def process_interpolation(image):
 
                             # print(I45)
 
-                            I_45 = image[indx, indy]
+                            I_45 = np.uint16(image[indx, indy])
                             I_45 += (image[indx-1, indy-1] +
                                      image[indx+1, indy+1]) / 2
 
@@ -101,10 +101,10 @@ def process_interpolation(image):
                     if yvecnew > image.shape[1]-1 or yvecnew < 0:
                         yvec[indice] = y
 
-                d45 = abs(image[xvec[2], yvec[1]] - image[xvec[1], yvec[2]]) + abs(
-                    2*image[x, y] - image[xvec[0], yvec[3]] - image[xvec[3], yvec[0]])
-                d_45 = abs(image[xvec[1], yvec[1]]-image[xvec[2], yvec[2]]) + abs(
-                    2*image[x, y] - image[xvec[0], yvec[0]] - image[xvec[3], yvec[3]])
+                d45 = np.uint16(abs(image[xvec[2], yvec[1]] - image[xvec[1], yvec[2]]) + abs(
+                    2*image[x, y] - image[xvec[0], yvec[3]] - image[xvec[3], yvec[0]]))
+                d_45 = np.uint16(abs(image[xvec[1], yvec[1]]-image[xvec[2], yvec[2]]) + abs(
+                    2*image[x, y] - image[xvec[0], yvec[0]] - image[xvec[3], yvec[3]]))
 
                 om45 = 1 / (d45 + eps)
                 om_45 = 1 / (d_45 + eps)
@@ -230,6 +230,15 @@ def interpolate_pol(i0, i45, i135, i90):
 
 def convert_to_HSL(i0, i45, i135, i90):
 
+    # print(np.amax(i0))
+    # print(np.amax(i45))
+    # print(np.amax(i90))
+    # print(np.amax(i135))
+    i0 = np.uint8(i0)
+    i45 = np.uint8(i45)
+    i90 = np.uint8(i90)
+    i135 = np.uint8(i135)
+
     Js = [i0, i45, i90, i135]
 
     inten = (Js[0]+Js[1]+Js[2]+Js[3])/2.
@@ -242,18 +251,36 @@ def convert_to_HSL(i0, i45, i135, i90):
         "/Users/marc/Github/Pola_NewtonPolynomial/output/aop.tiff", np.uint16(aop))
     cv2.imwrite(
         "/Users/marc/Github/Pola_NewtonPolynomial/output/dop.tiff", np.uint16(dop))
-    # inten = (i0+i45+i90+i135)/2.
-    # aop = (0.5*np.arctan2(i45-i135, i0-i45))
-    # dop = np.sqrt((i45-i135)**2+(i0-i45)**2) / (i0 + i90 + np.finfo(float).eps)
+    #inten = (i0+i45+i90+i135)/2.
+    #aop = (0.5*np.arctan2(i45-i135, i0-i45))
+    #dop = np.sqrt((i45-i135)**2+(i0-i45)**2) / (i0 + i90 + np.finfo(float).eps)
+    aopt = np.float64(2*((aop+np.pi/2)/np.pi*180))
+    print(aopt)
+    print(aopt.dtype)
+    dopt = (dop/dop.max())*255
+    print(dopt)
+    print(dopt.dtype)
+    dopa = dop*255
+    print(dopa)
+    print(dopa.dtype)
+    intet = inten/inten.max()*255
+    print(intet)
+    print(intet.dtype)
+    # cv2.imwrite(
+    #    "/Users/marc/Github/Pola_NewtonPolynomial/output/inten.tiff", np.uint16(inten))
+    # cv2.imwrite(
+    #    "/Users/marc/Github/Pola_NewtonPolynomial/output/aop.tiff", np.uint16(aop))
+    # cv2.imwrite(
+    #    "/Users/marc/Github/Pola_NewtonPolynomial/output/dop.tiff", np.uint16(dop))
 
     hsv = np.zeros((i0.shape[0], i0.shape[1], 3))
 
-    hsv[:, :, 0] = (aop+np.pi/2)/np.pi*180
-    hsv[:, :, 1] = dop*255
-    hsv[:, :, 2] = inten/inten.max()*255
-    hsv = np.uint8(hsv)
-    # hsv = cv2.merge((np.uint8((aop+np.pi/2)/np.pi*180),
-    #                 np.uint8(dop*255), np.uint8(inten/inten.max()*255)))
+    #hsv[:, :, 0] = (aop+np.pi/2)/np.pi*180
+    #hsv[:, :, 1] = dop*255
+    #hsv[:, :, 2] = inten/inten.max()*255
+    #hsv = np.uint8(hsv)
+    hsv = np.uint8(cv2.merge((np.float64((aop+np.pi/2)/np.pi*180),
+                              (dop)*255, inten/inten.max()*255)))
 
     # hsv = np.uint8(cv2.merge(((aop+np.pi/2)/np.pi*180,
     #                          dop*255,
