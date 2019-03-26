@@ -1,4 +1,6 @@
 '''
+Blanchon Marc - ERL VIBOT CNRS 6000 - 2019
+
 This code is the python conversion of Ning Li's release matlab code
 
 Please refer below for references 
